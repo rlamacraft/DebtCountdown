@@ -84,15 +84,15 @@ moneySubtractMoney a b =
 
 calculateRemainder : TotalOwed -> StartDate -> EndDate -> CurrentTime -> RemainderOwed
 calculateRemainder totalOwed startDate endDate currentTime =
-  case totalOwed of
-    NoInputValue -> MissingInputs "Owed Amount"
-    InputValue totalOwed_ -> case startDate of
-        NoInputValue -> MissingInputs "Start Date"
-        InputValue startDate_ -> case endDate of
-            NoInputValue -> MissingInputs "End Date"
-            InputValue endDate_ -> case currentTime of
-              Nothing -> MissingInputs "Current Time"
-              Just currentTime_ -> CalculatedValue <| actuallyCalculateRemainder totalOwed_ startDate_ endDate_ currentTime_
+  case startDate of
+    NoInputValue -> MissingInputs "Start Date"
+    InputValue startDate_ -> case endDate of
+        NoInputValue -> MissingInputs "End Date"
+        InputValue endDate_ -> case totalOwed of
+          NoInputValue -> MissingInputs "Total Original Debt"
+          InputValue totalOwed_ -> case currentTime of
+               Nothing -> MissingInputs "Current Time"
+               Just currentTime_ -> CalculatedValue <| actuallyCalculateRemainder totalOwed_ startDate_ endDate_ currentTime_
 
 actuallyCalculateRemainder : MonetaryValue -> Date.Date -> Date.Date -> Time.Time -> MonetaryValue
 actuallyCalculateRemainder totalOwed startDate endDate currentTime =

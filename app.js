@@ -8848,24 +8848,24 @@ var _user$project$Main$init = {
 };
 var _user$project$Main$calculateRemainder = F4(
 	function (totalOwed, startDate, endDate, currentTime) {
-		var _p2 = totalOwed;
+		var _p2 = startDate;
 		if (_p2.ctor === 'NoInputValue') {
-			return _user$project$Main$MissingInputs('Owed Amount');
+			return _user$project$Main$MissingInputs('Start Date');
 		} else {
-			var _p3 = startDate;
+			var _p3 = endDate;
 			if (_p3.ctor === 'NoInputValue') {
-				return _user$project$Main$MissingInputs('Start Date');
+				return _user$project$Main$MissingInputs('End Date');
 			} else {
-				var _p4 = endDate;
+				var _p4 = totalOwed;
 				if (_p4.ctor === 'NoInputValue') {
-					return _user$project$Main$MissingInputs('End Date');
+					return _user$project$Main$MissingInputs('Total Original Debt');
 				} else {
 					var _p5 = currentTime;
 					if (_p5.ctor === 'Nothing') {
 						return _user$project$Main$MissingInputs('Current Time');
 					} else {
 						return _user$project$Main$CalculatedValue(
-							A4(_user$project$Main$actuallyCalculateRemainder, _p2._0, _p3._0, _p4._0, _p5._0));
+							A4(_user$project$Main$actuallyCalculateRemainder, _p4._0, _p2._0, _p3._0, _p5._0));
 					}
 				}
 			}

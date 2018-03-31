@@ -1,0 +1,85 @@
+html, body {
+  margin: 0; }
+
+html, body, #container, main {
+  background-color: #f7f7f7;
+  height: 100%; }
+
+main {
+  display: flex;
+  flex-wrap: wrap; }
+  main .inputs {
+    height: auto;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    transition: background-color 0.5s ease;
+    background: #3d6f88;
+    background: -o-linear-gradient(316deg, #3d6f88, #1b3e44);
+    background: -moz-linear-gradient(316deg, #3d6f88, #1b3e44);
+    background: linear-gradient(136deg, #3d6f88, #1b3e44); }
+    @media (min-width: 700px) {
+      main .inputs {
+        height: auto;
+        width: 100vw; } }
+    main .inputs label {
+      font-family: "roboto", sans-serif;
+      color: #f7f7f7;
+      font-size: 2em;
+      align-self: flex-start;
+      display: flex;
+      flex-direction: column;
+      font-size: 1.4em;
+      margin: 30px 40px;
+      font-weight: 100;
+      letter-spacing: 0.5px;
+      width: calc(100% - 80px); }
+      main .inputs label input {
+        border: none;
+        background: none;
+        border-bottom: 2px solid #f7f7f7;
+        font-size: 1.5em;
+        font-weight: 200;
+        letter-spacing: 0.5px;
+        font-family: "roboto slab", serif;
+        color: #f7f7f7;
+        padding: 2px;
+        transition: all 0.5s ease; }
+        main .inputs label input:focus {
+          outline: none;
+          border-bottom-color: rgba(255, 255, 255, 0.5); }
+        main .inputs label input::-webkit-input-placeholder {
+          color: rgba(255, 255, 255, 0.4); }
+
+main .outputs {
+  height: auto;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  color: #566f7b;
+  flex-grow: 1; }
+  main .outputs .output {
+    margin: 15px;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 3px; }
+    main .outputs .output + .output {
+      margin-top: 0; }
+    main .outputs .output h1 {
+      font-family: "roboto", sans-serif;
+      font-weight: 100;
+      letter-spacing: 0.5px;
+      font-size: 12vw;
+      margin: 0;
+      text-align: center; }
+    main .outputs .output div {
+      margin: 20px; }
+      main .outputs .output div h2 {
+        font-family: "roboto slab", serif;
+        margin: 0;
+        margin-bottom: 5px; }
+      main .outputs .output div span {
+        font-family: "roboto slab", serif;
+        margin-left: 10px; }

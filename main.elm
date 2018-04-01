@@ -114,7 +114,9 @@ calculateRefreshRate_helper totalOwed_ startDate_ endDate_ =
     totalTimeInMillis = (*) 1000 <| (Time.inSeconds <| Date.toTime endDate_) - (Time.inSeconds <| Date.toTime startDate_)
     totalDebtInPennies = toFloat <| (+) totalOwed_.pence <| totalOwed_.pounds * 100
   in
-    (*) Time.millisecond <| toFloat <| floor <| (totalTimeInMillis / totalDebtInPennies)
+    if totalDebtInPennies == 0 then Time.second else
+      (*) Time.millisecond <| toFloat <| floor <| (totalTimeInMillis / totalDebtInPennies)
+
 
 -- if any data is missing then the default is 1 second
 calculateRefreshRate : TotalOwed -> StartDate -> EndDate -> Time.Time
@@ -147,13 +149,16 @@ update msg model =
       ({ model | remainder = calculateRemainder model.totalOwed model.startDate model.endDate model.currentTime }, Cmd.none)
     NewStartDate str -> case Date.fromString str of
       Err err -> ({ model | startDate = NoInputValue }, Cmd.none)
-      Ok date -> ({ model | startDate = InputValue date, refreshRate = calculateRefreshRate model.totalOwed (InputValue date) model.endDate}, Cmd.none)
+      Ok date -> ({ model | startDate = InputValue date, refreshRate = calculateRefreshRate model.totalOwed (InputValue date) model.endDate,
+        remainder = calculateRemainder model.totalOwed (InputValue date) model.endDate model.currentTime }, Cmd.none)
     NewEndDate str -> case Date.fromString str of
       Err err -> ({ model | endDate = NoInputValue }, Cmd.none)
-      Ok date -> ({ model | endDate = InputValue date, refreshRate = calculateRefreshRate model.totalOwed model.startDate (InputValue date) }, Cmd.none)
+      Ok date -> ({ model | endDate = InputValue date, refreshRate = calculateRefreshRate model.totalOwed model.startDate (InputValue date),
+        remainder = calculateRemainder model.totalOwed model.startDate (InputValue date) model.currentTime }, Cmd.none)
     NewTotalDebt str -> case String.toInt str of
       Err err -> ({ model | totalOwed = NoInputValue }, Cmd.none)
-      Ok amount -> ({ model | totalOwed = InputValue {pounds = amount, pence = 0}, refreshRate = calculateRefreshRate (InputValue {pounds = amount, pence = 0}) model.startDate model.endDate }, Cmd.none)
+      Ok amount -> ({ model | totalOwed = InputValue {pounds = amount, pence = 0}, refreshRate = calculateRefreshRate (InputValue {pounds = amount, pence = 0}) model.startDate model.endDate,
+        remainder = calculateRemainder (InputValue {pounds = amount, pence = 0}) model.startDate model.endDate model.currentTime }, Cmd.none)
 
 
 -- VIEW
@@ -168,7 +173,10 @@ remainderAsHtml remainder =
     commas str = if String.length str > 3 then (String.slice 0 -3 str) ++ "," ++ (String.slice -3 (String.length str) str) else str
   in
     case remainder of
-    MissingInputs str -> Html.text <| "Missing inputs: " ++ str
+    MissingInputs str -> Html.div []
+      [ Html.h1 [] [Html.text "Missing input"]
+      , Html.h2 [] [Html.text str]
+      ]
     CalculatedValue m -> Html.text <| (commas (toString m.pounds)) ++ "." ++ (leftPad (toString m.pence))
 
 view : Model -> Html Msg

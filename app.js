@@ -8761,8 +8761,32 @@ var _user$project$Main$remainderAsHtml = function (remainder) {
 	};
 	var _p0 = remainder;
 	if (_p0.ctor === 'MissingInputs') {
-		return _elm_lang$html$Html$text(
-			A2(_elm_lang$core$Basics_ops['++'], 'Missing inputs: ', _p0._0));
+		return A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$h1,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Missing input'),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$h2,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(_p0._0),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			});
 	} else {
 		var _p1 = _p0._0;
 		return _elm_lang$html$Html$text(
@@ -8796,7 +8820,7 @@ var _user$project$Main$calculateRefreshRate_helper = F3(
 			_elm_lang$core$Time$inSeconds(
 				_elm_lang$core$Date$toTime(endDate_)) - _elm_lang$core$Time$inSeconds(
 				_elm_lang$core$Date$toTime(startDate_)));
-		return A2(
+		return _elm_lang$core$Native_Utils.eq(totalDebtInPennies, 0) ? _elm_lang$core$Time$second : A2(
 			F2(
 				function (x, y) {
 					return x * y;
@@ -8967,7 +8991,13 @@ var _user$project$Main$update = F2(
 									_user$project$Main$calculateRefreshRate,
 									model.totalOwed,
 									_user$project$Main$InputValue(_p11),
-									model.endDate)
+									model.endDate),
+								remainder: A4(
+									_user$project$Main$calculateRemainder,
+									model.totalOwed,
+									_user$project$Main$InputValue(_p11),
+									model.endDate,
+									model.currentTime)
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
@@ -8994,7 +9024,13 @@ var _user$project$Main$update = F2(
 									_user$project$Main$calculateRefreshRate,
 									model.totalOwed,
 									model.startDate,
-									_user$project$Main$InputValue(_p13))
+									_user$project$Main$InputValue(_p13)),
+								remainder: A4(
+									_user$project$Main$calculateRemainder,
+									model.totalOwed,
+									model.startDate,
+									_user$project$Main$InputValue(_p13),
+									model.currentTime)
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
@@ -9023,7 +9059,14 @@ var _user$project$Main$update = F2(
 									_user$project$Main$InputValue(
 										{pounds: _p15, pence: 0}),
 									model.startDate,
-									model.endDate)
+									model.endDate),
+								remainder: A4(
+									_user$project$Main$calculateRemainder,
+									_user$project$Main$InputValue(
+										{pounds: _p15, pence: 0}),
+									model.startDate,
+									model.endDate,
+									model.currentTime)
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};

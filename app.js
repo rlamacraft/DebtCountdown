@@ -8796,7 +8796,7 @@ var _user$project$Main$calculateRefreshRate_helper = F3(
 			_elm_lang$core$Time$inSeconds(
 				_elm_lang$core$Date$toTime(endDate_)) - _elm_lang$core$Time$inSeconds(
 				_elm_lang$core$Date$toTime(startDate_)));
-		var ret = A2(
+		return A2(
 			F2(
 				function (x, y) {
 					return x * y;
@@ -8804,8 +8804,6 @@ var _user$project$Main$calculateRefreshRate_helper = F3(
 			_elm_lang$core$Time$millisecond,
 			_elm_lang$core$Basics$toFloat(
 				_elm_lang$core$Basics$floor(totalTimeInMillis / totalDebtInPennies)));
-		var debugRet = A2(_elm_lang$core$Debug$log, 'refreshRate: ', ret);
-		return ret;
 	});
 var _user$project$Main$calculateRefreshRate = F3(
 	function (totalOwed, startDate, endDate) {

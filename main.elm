@@ -113,10 +113,8 @@ calculateRefreshRate_helper totalOwed_ startDate_ endDate_ =
   let
     totalTimeInMillis = (*) 1000 <| (Time.inSeconds <| Date.toTime endDate_) - (Time.inSeconds <| Date.toTime startDate_)
     totalDebtInPennies = toFloat <| (+) totalOwed_.pence <| totalOwed_.pounds * 100
-    ret = (*) Time.millisecond <| toFloat <| floor <| (totalTimeInMillis / totalDebtInPennies)
-    debugRet = Debug.log "refreshRate: " ret
   in
-    ret
+    (*) Time.millisecond <| toFloat <| floor <| (totalTimeInMillis / totalDebtInPennies)
 
 -- if any data is missing then the default is 1 second
 calculateRefreshRate : TotalOwed -> StartDate -> EndDate -> Time.Time

@@ -38,6 +38,7 @@ type alias Model =
   , endDate     : EndDate
   , currentTime : CurrentTime
   , remainder   : RemainderOwed
+  , refreshRate : Time.Time
 }
 
 init : (Model, Cmd Msg)
@@ -47,6 +48,7 @@ init = (
   , endDate     = NoInputValue
   , currentTime = Nothing
   , remainder   = MissingInputs ""
+  , refreshRate = Time.second * 10
   }, Cmd.none)
 
 -- UPDATE
@@ -106,6 +108,30 @@ actuallyCalculateRemainder totalOwed startDate endDate currentTime =
   in
     remainder
 
+calculateRefreshRate_helper : MonetaryValue -> Date.Date -> Date.Date -> Time.Time
+calculateRefreshRate_helper totalOwed_ startDate_ endDate_ =
+  let
+    totalTimeInMillis = (*) 1000 <| (Time.inSeconds <| Date.toTime endDate_) - (Time.inSeconds <| Date.toTime startDate_)
+    totalDebtInPennies = toFloat <| (+) totalOwed_.pence <| totalOwed_.pounds * 100
+    ret = (*) Time.millisecond <| toFloat <| floor <| (totalTimeInMillis / totalDebtInPennies)
+    debugRet = Debug.log "refreshRate: " ret
+  in
+    ret
+
+-- if any data is missing then the default is 1 second
+calculateRefreshRate : TotalOwed -> StartDate -> EndDate -> Time.Time
+calculateRefreshRate totalOwed startDate endDate =
+  let
+    defaultRate = Time.second
+  in
+    case startDate of
+      NoInputValue -> defaultRate
+      InputValue startDate_ -> case endDate of
+          NoInputValue -> defaultRate
+          InputValue endDate_ -> case totalOwed of
+            NoInputValue -> defaultRate
+            InputValue totalOwed_ -> calculateRefreshRate_helper totalOwed_ startDate_ endDate_
+
 type Msg
   = Tick Time.Time
   | UpdateOutput
@@ -123,13 +149,13 @@ update msg model =
       ({ model | remainder = calculateRemainder model.totalOwed model.startDate model.endDate model.currentTime }, Cmd.none)
     NewStartDate str -> case Date.fromString str of
       Err err -> ({ model | startDate = NoInputValue }, Cmd.none)
-      Ok date -> ({ model | startDate = InputValue date }, Cmd.none)
+      Ok date -> ({ model | startDate = InputValue date, refreshRate = calculateRefreshRate model.totalOwed (InputValue date) model.endDate}, Cmd.none)
     NewEndDate str -> case Date.fromString str of
       Err err -> ({ model | endDate = NoInputValue }, Cmd.none)
-      Ok date -> ({ model | endDate = InputValue date }, Cmd.none)
+      Ok date -> ({ model | endDate = InputValue date, refreshRate = calculateRefreshRate model.totalOwed model.startDate (InputValue date) }, Cmd.none)
     NewTotalDebt str -> case String.toInt str of
       Err err -> ({ model | totalOwed = NoInputValue }, Cmd.none)
-      Ok amount -> ({ model | totalOwed = InputValue {pounds = amount, pence = 0} }, Cmd.none)
+      Ok amount -> ({ model | totalOwed = InputValue {pounds = amount, pence = 0}, refreshRate = calculateRefreshRate (InputValue {pounds = amount, pence = 0}) model.startDate model.endDate }, Cmd.none)
 
 
 -- VIEW
@@ -176,4 +202,4 @@ view model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Time.every Time.second Tick
+  Time.every model.refreshRate Tick

@@ -8777,6 +8777,56 @@ var _user$project$Main$remainderAsHtml = function (remainder) {
 						_elm_lang$core$Basics$toString(_p1.pence)))));
 	}
 };
+var _user$project$Main$calculateRefreshRate_helper = F3(
+	function (totalOwed_, startDate_, endDate_) {
+		var totalDebtInPennies = _elm_lang$core$Basics$toFloat(
+			A2(
+				F2(
+					function (x, y) {
+						return x + y;
+					}),
+				totalOwed_.pence,
+				totalOwed_.pounds * 100));
+		var totalTimeInMillis = A2(
+			F2(
+				function (x, y) {
+					return x * y;
+				}),
+			1000,
+			_elm_lang$core$Time$inSeconds(
+				_elm_lang$core$Date$toTime(endDate_)) - _elm_lang$core$Time$inSeconds(
+				_elm_lang$core$Date$toTime(startDate_)));
+		var ret = A2(
+			F2(
+				function (x, y) {
+					return x * y;
+				}),
+			_elm_lang$core$Time$millisecond,
+			_elm_lang$core$Basics$toFloat(
+				_elm_lang$core$Basics$floor(totalTimeInMillis / totalDebtInPennies)));
+		var debugRet = A2(_elm_lang$core$Debug$log, 'refreshRate: ', ret);
+		return ret;
+	});
+var _user$project$Main$calculateRefreshRate = F3(
+	function (totalOwed, startDate, endDate) {
+		var defaultRate = _elm_lang$core$Time$second;
+		var _p2 = startDate;
+		if (_p2.ctor === 'NoInputValue') {
+			return defaultRate;
+		} else {
+			var _p3 = endDate;
+			if (_p3.ctor === 'NoInputValue') {
+				return defaultRate;
+			} else {
+				var _p4 = totalOwed;
+				if (_p4.ctor === 'NoInputValue') {
+					return defaultRate;
+				} else {
+					return A3(_user$project$Main$calculateRefreshRate_helper, _p4._0, _p2._0, _p3._0);
+				}
+			}
+		}
+	});
 var _user$project$Main$moneySubtractMoney = F2(
 	function (a, b) {
 		var bInPenies = (b.pounds * 100) + b.pence;
@@ -8821,9 +8871,9 @@ var _user$project$Main$MonetaryValue = F2(
 	function (a, b) {
 		return {pounds: a, pence: b};
 	});
-var _user$project$Main$Model = F5(
-	function (a, b, c, d, e) {
-		return {totalOwed: a, startDate: b, endDate: c, currentTime: d, remainder: e};
+var _user$project$Main$Model = F6(
+	function (a, b, c, d, e, f) {
+		return {totalOwed: a, startDate: b, endDate: c, currentTime: d, remainder: e, refreshRate: f};
 	});
 var _user$project$Main$InputValue = function (a) {
 	return {ctor: 'InputValue', _0: a};
@@ -8842,30 +8892,31 @@ var _user$project$Main$init = {
 		startDate: _user$project$Main$NoInputValue,
 		endDate: _user$project$Main$NoInputValue,
 		currentTime: _elm_lang$core$Maybe$Nothing,
-		remainder: _user$project$Main$MissingInputs('')
+		remainder: _user$project$Main$MissingInputs(''),
+		refreshRate: _elm_lang$core$Time$second * 10
 	},
 	_1: _elm_lang$core$Platform_Cmd$none
 };
 var _user$project$Main$calculateRemainder = F4(
 	function (totalOwed, startDate, endDate, currentTime) {
-		var _p2 = startDate;
-		if (_p2.ctor === 'NoInputValue') {
+		var _p5 = startDate;
+		if (_p5.ctor === 'NoInputValue') {
 			return _user$project$Main$MissingInputs('Start Date');
 		} else {
-			var _p3 = endDate;
-			if (_p3.ctor === 'NoInputValue') {
+			var _p6 = endDate;
+			if (_p6.ctor === 'NoInputValue') {
 				return _user$project$Main$MissingInputs('End Date');
 			} else {
-				var _p4 = totalOwed;
-				if (_p4.ctor === 'NoInputValue') {
+				var _p7 = totalOwed;
+				if (_p7.ctor === 'NoInputValue') {
 					return _user$project$Main$MissingInputs('Total Original Debt');
 				} else {
-					var _p5 = currentTime;
-					if (_p5.ctor === 'Nothing') {
+					var _p8 = currentTime;
+					if (_p8.ctor === 'Nothing') {
 						return _user$project$Main$MissingInputs('Current Time');
 					} else {
 						return _user$project$Main$CalculatedValue(
-							A4(_user$project$Main$actuallyCalculateRemainder, _p4._0, _p2._0, _p3._0, _p5._0));
+							A4(_user$project$Main$actuallyCalculateRemainder, _p7._0, _p5._0, _p6._0, _p8._0));
 					}
 				}
 			}
@@ -8873,15 +8924,15 @@ var _user$project$Main$calculateRemainder = F4(
 	});
 var _user$project$Main$update = F2(
 	function (msg, model) {
-		var _p6 = msg;
-		switch (_p6.ctor) {
+		var _p9 = msg;
+		switch (_p9.ctor) {
 			case 'Tick':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{
-							currentTime: _elm_lang$core$Maybe$Just(_p6._0),
+							currentTime: _elm_lang$core$Maybe$Just(_p9._0),
 							remainder: A4(_user$project$Main$calculateRemainder, model.totalOwed, model.startDate, model.endDate, model.currentTime)
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
@@ -8897,8 +8948,8 @@ var _user$project$Main$update = F2(
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'NewStartDate':
-				var _p7 = _elm_lang$core$Date$fromString(_p6._0);
-				if (_p7.ctor === 'Err') {
+				var _p10 = _elm_lang$core$Date$fromString(_p9._0);
+				if (_p10.ctor === 'Err') {
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
@@ -8907,19 +8958,25 @@ var _user$project$Main$update = F2(
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
+					var _p11 = _p10._0;
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
 							{
-								startDate: _user$project$Main$InputValue(_p7._0)
+								startDate: _user$project$Main$InputValue(_p11),
+								refreshRate: A3(
+									_user$project$Main$calculateRefreshRate,
+									model.totalOwed,
+									_user$project$Main$InputValue(_p11),
+									model.endDate)
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				}
 			case 'NewEndDate':
-				var _p8 = _elm_lang$core$Date$fromString(_p6._0);
-				if (_p8.ctor === 'Err') {
+				var _p12 = _elm_lang$core$Date$fromString(_p9._0);
+				if (_p12.ctor === 'Err') {
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
@@ -8928,19 +8985,25 @@ var _user$project$Main$update = F2(
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
+					var _p13 = _p12._0;
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
 							{
-								endDate: _user$project$Main$InputValue(_p8._0)
+								endDate: _user$project$Main$InputValue(_p13),
+								refreshRate: A3(
+									_user$project$Main$calculateRefreshRate,
+									model.totalOwed,
+									model.startDate,
+									_user$project$Main$InputValue(_p13))
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				}
 			default:
-				var _p9 = _elm_lang$core$String$toInt(_p6._0);
-				if (_p9.ctor === 'Err') {
+				var _p14 = _elm_lang$core$String$toInt(_p9._0);
+				if (_p14.ctor === 'Err') {
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
@@ -8949,13 +9012,20 @@ var _user$project$Main$update = F2(
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
+					var _p15 = _p14._0;
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
 							{
 								totalOwed: _user$project$Main$InputValue(
-									{pounds: _p9._0, pence: 0})
+									{pounds: _p15, pence: 0}),
+								refreshRate: A3(
+									_user$project$Main$calculateRefreshRate,
+									_user$project$Main$InputValue(
+										{pounds: _p15, pence: 0}),
+									model.startDate,
+									model.endDate)
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
@@ -9104,7 +9174,7 @@ var _user$project$Main$Tick = function (a) {
 	return {ctor: 'Tick', _0: a};
 };
 var _user$project$Main$subscriptions = function (model) {
-	return A2(_elm_lang$core$Time$every, _elm_lang$core$Time$second, _user$project$Main$Tick);
+	return A2(_elm_lang$core$Time$every, model.refreshRate, _user$project$Main$Tick);
 };
 var _user$project$Main$main = _elm_lang$html$Html$program(
 	{init: _user$project$Main$init, view: _user$project$Main$view, update: _user$project$Main$update, subscriptions: _user$project$Main$subscriptions})();
